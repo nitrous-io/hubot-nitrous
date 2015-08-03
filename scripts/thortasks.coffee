@@ -5,11 +5,16 @@
 #   hubot thortasks list - list thor tasks
 #   hubot thortasks update - update local thor tasks from dedicated project. Use carefully
 #
+# Dependencies:
+#   child_process:*
+# 
 # Notes:
 #   help is done in two steps because we want to dinamically do "thor list"
 
+child_process = require 'child_process'
+
 execute_thor = (cmd, args, env, text, cb) ->
-  @exec = require('child_process').exec
+  @exec = child_process.exec
   dedicated_home = process.env.DEDICATED_HOME
   env_string = ("#{key}=#{value}" for key,value of env).join ' '
   command = "cd #{dedicated_home} && #{env_string} bundle exec thor #{cmd} #{args}"
@@ -19,7 +24,7 @@ execute_thor = (cmd, args, env, text, cb) ->
     cb if stderr
 
 update_thor = (cb) ->
-  @exec = require('child_process').exec
+  @exec = child_process.exec
   dedicated_home = process.env.DEDICATED_HOME
   command = "cd #{dedicated_home} && git pull origin master"
   @exec command, (error, stdout, stderr) ->
