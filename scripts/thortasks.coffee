@@ -40,15 +40,12 @@ environments = {
 # Just send thor -t as help message
 help_thor = (res) ->
   execute_thor "list", "", {NITROUS_PG_URL:environments.production.NITROUS_PG_URL}, "I'm here to help you", (str) ->
-    re = /thor\ /g
-    str = str.replace(re, "hubot ")
-    res.reply str
+    res.reply str.replace(/thor\ /g, "hubot ")
 
 module.exports = (robot) ->
   robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
-    cmd = res.match[1]
-    args = res.match[2]
-    environment = res.match[3] || "production"
+    [_, cmd, args, environment] = res.match
+    environment ||= "production"
 
     execute_thor cmd, args, {NITROUS_PG_URL:environments[environment].NITROUS_PG_URL}, "Running: `#{cmd} #{args}` on #{environment}" , (str) ->
       res.send(str)
