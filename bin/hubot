@@ -14,4 +14,9 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source $DIR/env
 
-exec node_modules/.bin/hubot --name "hubot" --adapter slack "$@"
+# Select by default slack adapter
+if [ "$#" -eq "0" ]; then
+  exec node_modules/.bin/hubot --name "hubot" --adapter slack
+else
+  exec node_modules/.bin/hubot --name "hubot" "$@"
+fi
