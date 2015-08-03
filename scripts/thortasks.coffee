@@ -1,14 +1,31 @@
-# This code executes thortasks from dedicated project
+# Description:
+#   This code executes thortasks from dedicated project
+#
+# Commands:
+#   hubot thortasks list - list thor tasks
+#   hubot thortasks update - update local thor tasks from dedicated project. Use carefully
+#
+# Notes:
+#   help is done in two steps because we want to dinamically do "thor list"
 
-execute_thor = (cmd, args, env, text, res) ->
+execute_thor = (cmd, args, env, text, cb) ->
   @exec = require('child_process').exec
   dedicated_home = process.env.DEDICATED_HOME
   env_string = ("#{key}=#{value}" for key,value of env).join ' '
   command = "cd #{dedicated_home} && #{env_string} bundle exec thor #{cmd} #{args}"
   @exec command, (error, stdout, stderr) ->
-    res.send "Something went wrong" if error
-    res.send "```\n#{text}: \n#{stdout}\n```" if stdout
-    res.send stderr if stderr
+    cb "Something went wrong" if error
+    cb "```\n#{text}: \n#{stdout}```" if stdout
+    cb if stderr
+
+update_thor = (cb) ->
+  @exec = require('child_process').exec
+  dedicated_home = process.env.DEDICATED_HOME
+  command = "cd #{dedicated_home} && git pull origin master"
+  @exec command, (error, stdout, stderr) ->
+    cb "Something went wrong" if error
+    cb "```#{stdout}```" if stdout
+    cb if stderr
 
 
 environments = {
@@ -20,21 +37,25 @@ environments = {
   }
 }
 
-
-help = () ->
-  return "\
-  `users:info IDENT [ENV]`: Gets information from a user.\n
-     IDENT User's username.\n
-     ENV could be staging or production. Default is production\n
-  `users:allow_free IDENT ENV]`: Enables free workspaces for a user\n
-     IDENT User's username.\n
-     ENV could be staging or production. Default is production\n
-  "
+# Just send thor -t as help message
+help_thor = (res) ->
+  execute_thor "list", "", {NITROUS_PG_URL:environments.production.NITROUS_PG_URL}, "I'm here to help you", (str) ->
+    re = /thor\ /g
+    str = str.replace(re, "hubot ")
+    res.reply str
 
 module.exports = (robot) ->
-  robot.hear /@*hubot:* ([^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
+  robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
     cmd = res.match[1]
     args = res.match[2]
     environment = res.match[3] || "production"
 
-    execute_thor cmd, args, {NITROUS_PG_URL:environments[environment].NITROUS_PG_URL}, "Running: `#{cmd} #{args}` on #{environment}" , res
+    execute_thor cmd, args, {NITROUS_PG_URL:environments[environment].NITROUS_PG_URL}, "Running: `#{cmd} #{args}` on #{environment}" , (str) ->
+      res.send(str)
+
+  robot.respond /thortasks list$/, (res) ->
+    help_thor res
+
+  robot.respond /thortasks update$/, (res) ->
+    update_thor (str) ->
+      res.reply str
