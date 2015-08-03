@@ -15,6 +15,9 @@
 child_process = require 'child_process'
 lodash = require 'lodash'
 
+escape_shell = (shell_str) ->
+  return shell_str.replace /([\(\)"\s'$`\\])/g, '\\$1'
+
 environments = {
   staging: {
     env: {
@@ -34,8 +37,8 @@ default_options = {
 }
 
 execute_thor = (cmd, args, options, text, cb) ->
-  command = "bundle exec thor #{cmd} #{args}"
-
+  # cmd should be already filtered by regexp at hubot listener
+  command = "bundle exec thor #{cmd} #{escape_shell(args)}"
   child_process.exec command, lodash.merge(default_options, options), (error, stdout, stderr) ->
     cb "Something went wrong" if error
     cb "```\n#{text}: \n#{stdout}```" if stdout
@@ -49,13 +52,13 @@ update_thor = (cb) ->
     cb stderr if stderr
 
 
-# Just send thor -t as help message
+# Just send thor list as help message
 help_thor = (res) ->
   execute_thor "list", "", environments.production, "I'm here to help you", (str) ->
     res.reply str.replace(/thor\ /g, "hubot ")
 
 module.exports = (robot) ->
-  robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
+  robot.respond /([a-zA-Z]+:[a-zA-Z]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
     [_, cmd, args, environment] = res.match
     environment ||= "production"
 
