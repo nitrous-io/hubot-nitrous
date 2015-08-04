@@ -38,7 +38,7 @@ default_options = {
 
 execute_thor = (cmd, args, options, text, cb) ->
   # cmd should be already filtered by regexp at hubot listener
-  command = "bundle exec thor #{cmd} #{escape_shell(args)}"
+  command = "bundle exec thor #{escape_shell(cmd)} #{escape_shell(args)}"
   child_process.exec command, lodash.merge(default_options, options), (error, stdout, stderr) ->
     cb "Something went wrong" if error
     cb "```\n#{text}: \n#{stdout}```" if stdout
@@ -58,7 +58,7 @@ help_thor = (res) ->
     res.reply str.replace(/thor\ /g, "hubot ")
 
 module.exports = (robot) ->
-  robot.respond /([a-zA-Z]+:[a-zA-Z_]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
+  robot.respond /([^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
     [_, cmd, args, environment] = res.match
     environment ||= "production"
 
