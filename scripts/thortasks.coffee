@@ -58,7 +58,7 @@ help_thor = (res) ->
     res.reply str.replace(/thor\ /g, "hubot ")
 
 module.exports = (robot) ->
-  robot.respond /([^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
+  robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
     [_, cmd, args, environment] = res.match
     environment ||= "production"
 
