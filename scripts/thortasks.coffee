@@ -16,7 +16,7 @@ child_process = require 'child_process'
 lodash = require 'lodash'
 
 escape_shell = (shell_str) ->
-  return shell_str.replace /([\(\)"\s'$`\\])/g, '\\$1'
+  return shell_str.replace /([\(\);&\|"\s'$`\\])/g, '\\$1'
 
 environments = {
   staging: {
