@@ -16,7 +16,9 @@ child_process = require 'child_process'
 lodash = require 'lodash'
 
 escape_shell = (shell_str) ->
-  return shell_str.replace /([\(\);&\|"\s'$`\\])/g, '\\$1'
+  if shell_str
+    return shell_str.replace /([\(\);&\|"\s'$`\\])/g, '\\$1'
+  else return ""
 
 environments = {
   staging: {
@@ -58,8 +60,9 @@ help_thor = (res) ->
     res.reply str.replace(/thor\ /g, "hubot ")
 
 module.exports = (robot) ->
-  robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
-    [_, cmd, args, environment] = res.match
+  robot.respond /([^\ ]+:[^\ ]+)( ([^\ ]+)\ ?)?(staging|production)?$/, (res) ->
+    [_, cmd, _, args, environment] = res.match
+    args ||= ""
     environment ||= "production"
 
     execute_thor cmd, args, environments[environment], "Running: `#{cmd} #{args}` on #{environment}" , (str) ->
