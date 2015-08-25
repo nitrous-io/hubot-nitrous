@@ -1,6 +1,11 @@
-#!/bin/bash
+#!/bin/bash -e
 set -e
+source /usr/local/opt/nvm/nvm.sh
+export RBENV_ROOT=/usr/local/opt/rbenv
+export PATH=$RBENV_ROOT/bin:$PATH
+eval "$($RBENV_ROOT/bin/rbenv init -)"
 
+nvm use 0.12.5
 npm install
 export PATH="node_modules/.bin:node_modules/hubot/node_modules/.bin:$PATH"
 
