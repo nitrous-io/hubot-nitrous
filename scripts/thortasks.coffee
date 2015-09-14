@@ -60,6 +60,10 @@ help_thor = (res) ->
 module.exports = (robot) ->
   robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
     [_, cmd, args, environment] = res.match
+
+    unless cmd.split(':')[0] in ['users']
+      return
+
     environment ||= "production"
 
     execute_thor cmd, args, environments[environment], "Running: `#{cmd} #{args}` on #{environment}" , (str) ->
