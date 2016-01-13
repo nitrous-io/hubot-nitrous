@@ -4,11 +4,10 @@
 # Commands:
 #   hubot deploy APP [environment]
 #
+
 module.exports = (robot) ->
 
-  robot.respond /deploy ([^\ ]+) (staging|production)?$/, (msg) ->
-    [_, app, environment] = msg.match
-    environment ||= "staging"
+  deploy = (app, environment, msg) ->
     url = process.env.HUBOT_JENKINS_URL
     job = "fastfood-deployer-#{environment}"
     params = "APP=#{app}"
@@ -32,3 +31,10 @@ module.exports = (robot) ->
           msg.reply "Build not found, double check that it exists and is spelt correctly."
         else
           msg.reply "Jenkins says: Status #{res.statusCode} #{body}"
+
+  robot.respond /deploy ([^\ ]+)( (staging|production))?$/, (msg) ->
+    console.log msg.match
+    [_, app, _, environment] = msg.match
+    environment ||= "staging"
+
+    deploy app, environment, msg
