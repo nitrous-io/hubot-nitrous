@@ -1,3 +1,7 @@
+# Vendored script from https://github.com/appneta/hubot-jenkins-deploy/blob/master/src/jenkins-deploy.coffee
+# Version: 1e1f743dad585f0fbd8f94b190d4f3ce06a09983
+# Commit: https://github.com/appneta/hubot-jenkins-deploy/commit/1e1f743dad585f0fbd8f94b190d4f3ce06a09983
+
 # Description:
 #   Interact with your Jenkins CI server
 #
