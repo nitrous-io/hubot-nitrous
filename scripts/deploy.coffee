@@ -14,11 +14,7 @@ module.exports = (robot) ->
     params = "APP=#{app}"
     path = "#{url}/job/#{job}/buildWithParameters?#{params}"
 
-    # monkeypatch the msg.match object
-    msg.match[1] = job
-    msg.match[3] = params
-
-    req = msg.http(path)
+    req = robot.http(path)
 
     if process.env.HUBOT_JENKINS_AUTH
       auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
