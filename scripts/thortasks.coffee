@@ -16,7 +16,10 @@ child_process = require 'child_process'
 lodash = require 'lodash'
 
 escape_shell = (shell_str) ->
-  return shell_str.replace /([\(\);&\|"\s'$`\\])/g, '\\$1'
+  if shell_str
+    shell_str.replace /([\(\);&\|"'$`\\])/g, '\\$1'
+  else
+    ""
 
 environments = {
   staging: {
@@ -36,9 +39,9 @@ default_options = {
   cwd: process.env.DEDICATED_HOME
 }
 
-execute_thor = (cmd, args, options, text, cb) ->
+execute_thor = (cmd, options, text, cb) ->
   # cmd should be already filtered by regexp at hubot listener
-  command = "bundle exec thor #{escape_shell(cmd)} #{escape_shell(args)}"
+  command = "bundle exec thor #{escape_shell(cmd)}"
   child_process.exec command, lodash.merge(default_options, options), (error, stdout, stderr) ->
     cb "Something went wrong" if error
     cb "```\n#{text}: \n#{stdout}```" if stdout
@@ -54,20 +57,21 @@ update_thor = (cb) ->
 
 # Just send thor list as help message
 help_thor = (res) ->
-  execute_thor "list", "", environments.production, "I'm here to help you", (str) ->
+  execute_thor "list", environments.production, "I'm here to help you", (str) ->
     res.reply str.replace(/thor\ /g, "hubot ")
 
 module.exports = (robot) ->
-  robot.respond /([^\ ]+:[^\ ]+) ([^\ ]+)\ ?(staging|production)?$/, (res) ->
-    [_, cmd, args, environment] = res.match
-    environment ||= "production"
-
-    execute_thor cmd, args, environments[environment], "Running: `#{cmd} #{args}` on #{environment}" , (str) ->
-      res.send(str)
-
   robot.respond /thortasks list$/, (res) ->
     help_thor res
 
   robot.respond /thortasks update$/, (res) ->
     update_thor (str) ->
       res.reply str
+
+  # Note: used the not greedy operator (*?) to avoid recognizing the environment inside the task
+  robot.respond /tt (.*?)( (staging|production))?$/, (res) ->
+    [_, cmd, _, environment] = res.match
+    environment ||= "production" # Default production for thortasks
+
+    execute_thor cmd, environments[environment], "Running: `#{cmd}` on #{environment}" , (str) ->
+      res.send(str)
