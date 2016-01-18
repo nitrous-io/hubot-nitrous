@@ -58,7 +58,7 @@ update_thor = (cb) ->
 # Just send thor list as help message
 help_thor = (res) ->
   execute_thor "list", environments.production, "I'm here to help you", (str) ->
-    res.reply str.replace(/thor\ /g, "hubot ")
+    res.reply str.replace(/thor\ /g, "hubot tt ")
 
 module.exports = (robot) ->
   robot.respond /thortasks list$/, (res) ->
