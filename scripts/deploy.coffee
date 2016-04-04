@@ -5,6 +5,22 @@
 #   hubot deploy APP [environment]
 #
 
+HELP= """
+```
+deploy APP [ENVIRONMENT]
+Deployment targets
+ - nitrous-react   - Webapp of Nitrous.io
+ - registry        - Docker registry for Org snapshots of Nitrous.io
+ - rise-server     - Api server and deployer of PubStorm
+ - rise-apiserver  - Api server and deployer of PubStorm
+ - rise-deployer   - Api server and deployer of PubStorm
+ - rise-edge       - Nginx lua on each edge of PubStorm
+ - rise-redirector - Pubstorm A redirector
+ - rise-all        - Deploy all targets of PubStorm
+```
+"""
+
+
 deploy = (app, environment, robot, msg) ->
   url = process.env.HUBOT_JENKINS_URL
   job = "fastfood-deployer-#{environment}"
@@ -37,4 +53,7 @@ module.exports = (robot) ->
     environment ||= "staging"
     console.log "Deploying #{app} to #{environment}"
 
-    deploy app, environment, robot, msg
+    if app == "help"
+      msg.reply HELP
+    else
+      deploy app, environment, robot, msg
