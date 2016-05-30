@@ -24,12 +24,14 @@ escape_shell = (shell_str) ->
 environments = {
   staging: {
     env: {
-      NITROUS_PG_URL: process.env.STAGING_PG_URL
+      NITROUS_PG_URL: process.env.STAGING_NITROUS_PG_URL,
+      PUBSTORM_PG_URL: process.env.STAGING_PUBSTORM_PG_URL
     }
   },
   production: {
     env: {
-      NITROUS_PG_URL: process.env.PRODUCTION_PG_URL
+      NITROUS_PG_URL: process.env.PRODUCTION_NITROUS_PG_URL,
+      PUBSTORM_PG_URL: process.env.PRODUCTION_PUBSTORM_PG_URL
     }
   }
 }
